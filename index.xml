@@ -1,0 +1,106 @@
+<INDEX REVISION="01.00.00">
+  <DEVICE ID="0x4020" PRODUCTNAME="Bose QuietComfort 35 II">
+    <HARDWARE REVISION="01.00.00">
+      <RELEASE HTTPHOST="downloads.bose.com" LANGUAGES="en-us,es-mx,fr,de,zh-cn,ja,ko,it,pt-br,sv,nl,ru,pl" REVISION="4.5.2.144" URLPATH="/ced/baywolf/">
+        <IMAGE CRC="0XFFFFFFFF" FILENAME="BayWolf_4.5.2_stack_plus_app.dfu" LENGTH="1942460" NOFORCE="1" REVISION="4.5.2.144" SUBID="0" />
+        <IMAGE CRC="0XC64078AA" FILENAME="BayWolf_4.5.2_ext_signed.xuv" LENGTH="22618624" NOFORCE="0" REVISION="4.5.2.144" SUBID="1" TARGET="1" />
+        <IMAGE CRC="0X8CF951D5" FILENAME="BayWolf_4.5.2_acorn_coeffs_signed.xuv" LENGTH="32944" NOFORCE="0" REVISION="4.5.2.144" SUBID="2" TARGET="3" />
+      </RELEASE>
+      <RELEASE HTTPHOST="github.com" LANGUAGES="en-us,es-mx,fr,de,zh-cn,ja,ko,it,pt-br,sv,nl,ru,pl" REVISION="3.1.8.1835" URLPATH="/avicoder/Boss-headphones-firmware/blob/master/">
+        <IMAGE CRC="0XFFFFFFFF" FILENAME="BayWolf_3.1.8_stack_plus_app.dfu" LENGTH="1899496" NOFORCE="1" REVISION="3.1.8.1835" SUBID="0" />
+        <IMAGE CRC="0X3F094999" FILENAME="BayWolf_3.1.8_ext_signed.xuv" LENGTH="22618624" NOFORCE="0" REVISION="3.1.8.1835" SUBID="1" TARGET="1" />
+        <IMAGE CRC="0X8CF951D5" FILENAME="BayWolf_3.1.8_acorn_coeffs_signed.xuv" LENGTH="32944" NOFORCE="0" REVISION="3.1.8.1835" SUBID="2" TARGET="3" />
+      </RELEASE>
+    </HARDWARE>
+  </DEVICE>
+</INDEX>
+
+
+Hi guys, 
+My name is Thomas from Greece. I just did a manual downgrade from 4.5.2 to 3.1.8
+
+Here is how i did it! 
+If you like my tutorial and the effort i put into this feel free to buy me a coffee ;)
+http://paypal.me/TFoskolos 
+
+DISCLAIMER NOTICE
+I'm not responsible for bricked devices. You are doing this at your own risk.
+
+Information:
+I did this on Windows OS. This is for advanced users obviously, but feel free to ask question and i will try to answer back anyway i can.
+
+Bose uses the "Bose Update" software with conjunction to the website https://btu.bose.com.
+When you launch the app and the website it does the following things.
+1. Checks https://worldwide.bose.com/connected_device to find out based on your ID which next file to look at.
+2. Since our device (QC 35 II) has the codename BayWolf it goes to check the following link  https://downloads.bose.com/ced/baywolf/index.xml
+3. This link shows the list of available firmwares for this device. As you can see for yourself it only shows the 4.5.2 version. This is because Bose doesn't allow to install other firmware at this moment. (meh)
+You can fine the log of the "Bose Update" app in "C:\Users\[your user]\AppData\Local\Temp\BoseUpdater.log"
+If you cant see AppData folder you need to enable seeing hidden folders in Windows.
+
+
+Step 1: Change the initial lookup link from the "Bose Update" app.
+The Bose update app location is here "C:\Program Files (x86)\Bose Updater". 
+1. Make an original backup of the file "BOSEUPDATER.EXE" and rename it to something like "BOSEUPDATER.EXE.backup"
+2. Download and install a hex editor. I used https://mh-nexus.de/en/hxd/ 
+3. Copy the BOSEUPDATER.EXE file to your desktop. 
+4. Open the file you copied to your desktop with the hex editor.
+5. Go to Search -> Find and in the tab "Search-string" search for the word "connected_device" 
+Screenshot:  https://imgur.com/a/tJpp6k6 Screenshot2:   https://imgur.com/a/KWJ7shb 
+6. Now change the URL with your own. I used VSCode to run a small web server in order the serve my altered XML file but you can use your own.
+Important: Your URL must be exactly the same number of characters as the previous one. This will not change the size of the app. Here is my modification. Screenshot:   https://imgur.com/a/4yrgwvw 
+As you can see i have put some extra 'a' characters to match the length of the initial URL.
+7. Save the file and copy and replace it back to "C:\Program Files (x86)\Bose Updater"
+8. Run the app to see if it launches correctly. (It will show the icon on the bottom right on your taskbar) and then exit the app (right click and Select Exit)  
+
+Step 2: Run the webserver with your altered XML files.
+I used VSCode but you can use anything you feel comfortable with.
+1. Download and Install VSCode.  https://code.visualstudio.com/ 
+2. After you install VSCode go to Extensions and install "Live Server" from Ritwick Dey. (installing VSCode extensions is out of the scope of this tutorial :P)
+3. Have the following folder structure in your desktop. Screenshot:  https://imgur.com/a/exxkN6Q 
+
+Bose Mock
+----aaaaaaaaaa
+--------index.xml
+--------lookup.xml
+
+4. The lookup.xml file is the one from here ( https://downloads.bose.com/lookup.xml ) but i changed the part about my device. Screenshot: https://imgur.com/a/5gCMQgI 
+5. The index.xml file is the one from here ( https://downloads.bose.com/ced/baywolf/index.xml ) but i also added the 3.1.8 firmware. Screenshot: https://imgur.com/a/HmYzVUm 
+
+Notes: I found the firmware from another post to this github page.  https://github.com/avicoder/Boss-headphones-firmware it also has the 2.5.1 firmware. (not tested)
+I didn't use VSCode web-server to serve the firmware files because it needs to be HTTPS.
+In my successful downgrade i didn't use GitHub but my own private server. I am guessing GitHub should also work fine.
+6. Right click on your "Bose Mock" folder in your desktop and select "Open with Code"
+7. In VSCode, right click on your index.xml file (or lookup.xml) and select "Open with Live Server" 
+Screenshot:  https://imgur.com/a/Ab8dIXB 
+8. If everything is OK you should be able to open a browser and see your altered files via the following URLs
+ http://127.0.0.1:5500/aaaaaaaaaa/index.xml 
+ http://127.0.0.1:5500/aaaaaaaaaa/lookup.xml 
+
+
+Step 3: Update via Advanced method.
+Be sure to have closed the "Bose Update app"
+1. Turn off your headphones and connect them via USB.
+2. Go to https://btu.bose.com and wait until it prompts you to launch the app (or launch it manually from "C:\Program Files (x86)\Bose Updater"
+3. When you see this screen (Screenshot:  https://imgur.com/a/xGijdYC ) press the following key combination. 
+'a' 'd' 'v' 'up arrow' 'down arrow' and you will see the following screen - Screenshot:  https://imgur.com/a/yTLalsc 
+4. Now you can select the firmware 3.1.8 and click on Update. 
+5. Wait for the update process to complete
+6. Enjoy your OLD FIRMWARE HEADSET! Cheers!
+
+Feel free to ask questions.
+I understand this is not for everybody but i thought it was worth to share.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
